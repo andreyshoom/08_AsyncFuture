@@ -13,6 +13,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final String _nameOfFile = 'data.txt';
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -21,26 +23,37 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Catch error'),
           centerTitle: true,
         ),
-        body: FutureBuilder(
-          future: fetchFileFromAssets('assets1/data.txt'),
-          builder: (BuildContext coontext, AsyncSnapshot snapshot) {
-            if (snapshot.hasError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Text('File not found!'),
-                  ],
-                ),
-              );
-            } else if (snapshot.hasData) {
-              return SingleChildScrollView(
-                child: Text(snapshot.data),
-              );
-            } else {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+        body: FutureBuilder<String>(
+          future: fetchFileFromAssets('assets/$_nameOfFile'),
+          builder: (BuildContext coontext, AsyncSnapshot<String> snapshot) {
+            print('hasError ${snapshot.hasError}');
+            print('hasData ${snapshot.hasData}');
+            switch (snapshot.connectionState) {
+              case ConnectionState.none:
+                return const Text('None');
+              case ConnectionState.waiting:
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              case ConnectionState.done:
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Text('File not found!'),
+                      ],
+                    ),
+                  );
+                } else {
+                  return SingleChildScrollView(
+                    child: Text(snapshot.data.toString()),
+                  );
+                }
+              default:
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
             }
           },
         ),

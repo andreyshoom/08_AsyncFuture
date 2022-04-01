@@ -9,25 +9,10 @@ class TextFiledFile extends StatefulWidget {
 }
 
 class _TextFiledFileState extends State<TextFiledFile> {
-  TextEditingController _controller = TextEditingController();
-  late Future _future;
-  @override
-  void initState() {
-    // fetchFileFromAssets('assets/data.txt');
-    _future = fetchFileFromAssets();
-    // _controller.text = 'data.txt';
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _controller.dispose();
-  }
-
+  final TextEditingController _controller = TextEditingController();
+  String _nameOfFile = '';
   @override
   Widget build(BuildContext context) {
-    // fetchFileFromAssets('assets/dat//a.txt');
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
@@ -85,15 +70,14 @@ class _TextFiledFileState extends State<TextFiledFile> {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.fromLTRB(0, 0, 10, 22),
+                    padding: const EdgeInsets.fromLTRB(0, 0, 10, 22),
                     child: ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          _future = fetchFileFromAssets(
-                              'assets/${_controller.text.toString()}');
+                          _nameOfFile = 'data.tax';
                         });
                       },
-                      child: Text('Search'),
+                      child: const Text('Search'),
                       style: ElevatedButton.styleFrom(
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.only(
@@ -110,42 +94,47 @@ class _TextFiledFileState extends State<TextFiledFile> {
                   ),
                 ],
               ),
-              Container(
-                child: FutureBuilder(
-                  future: _future,
-                  builder: (BuildContext context, AsyncSnapshot snapshot) {
-                    // if (searchNotEmty == true) {
-                    if (snapshot.hasError) {
-                      return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Text('File not found!'),
-                          ],
-                        ),
-                      );
-                    } else if (snapshot.hasData) {
-                      return SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            Container(
-                              margin: EdgeInsets.fromLTRB(0, 0, 320, 10),
-                              child: Text('${_controller.text.toString()}'),
-                            ),
-                            Container(
-                              margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
-                              child: Text(snapshot.data),
-                            ),
-                          ],
-                        ),
-                      );
-                    } else {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                  },
-                ),
+              FutureBuilder(
+                future: fetchFileFromAssets(
+                    'assets/${_controller.text.toString()}'),
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  // _controller.text.isEmpty
+                  if (snapshot.hasData) {
+                    return SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.fromLTRB(0, 0, 320, 10),
+                            child: Text('${_controller.text.toString()}'),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                            child: Text(snapshot.data),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else if (snapshot.hasError) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text('File not found!'),
+                          Text('${snapshot.error}'),
+                        ],
+                      ),
+                    );
+                  } else {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          CircularProgressIndicator(),
+                        ],
+                      ),
+                    );
+                  }
+                },
               ),
             ],
           ),
