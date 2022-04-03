@@ -74,7 +74,7 @@ class _TextFiledFileState extends State<TextFiledFile> {
                     child: ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          _nameOfFile = 'data.tax';
+                          _nameOfFile = _controller.text;
                         });
                       },
                       child: const Text('Search'),
